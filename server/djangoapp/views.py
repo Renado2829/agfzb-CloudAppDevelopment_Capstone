@@ -96,12 +96,45 @@ def get_dealerships(request):
     if request.method == "GET":
         return render(request, 'djangoapp/index.html', context)
 
+def get_dealerships(request):
+    if request.method == "GET":
+        url = "your-cloud-function-domain/dealerships/dealer-get"
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        # Concat all dealer's short name
+        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # Return a list of dealer short name
+        return HttpResponse(dealer_names)
 
-# Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
+from django.http import HttpResponse
+from django.template import loader
+from .restapis import get_dealer_reviews_from_cf
 
-# Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    reviews = get_dealer_reviews_from_cf(dealer_id)
+    context = {'reviews': reviews}
+    template = loader.get_template('dealer_reviews.html')
+    return HttpResponse(template.render(context, request))
+
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
+from .restapis import post_request
+
+@login_required
+def add_review(request, dealer_id):
+    if request.method == 'POST':
+        review = {
+            'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'name': request.user.username,
+            'dealership': dealer_id,
+            'review': request.POST.get('review'),
+            'purchase': request.POST.get('purchase')
+        }
+        url = f"https://your-cloud-function-url/reviews"
+        post_request(url, json_payload=review)
+        return HttpResponse("Review added successfully.")
+    else:
+        return HttpResponse("Invalid request.")
+
 
