@@ -28,3 +28,8 @@
        console.log(err);
      });
  }
+ cloudant.db.list().then((body) => {
+    body.forEach((db) => {
+        dbList.push(db);
+    });
+}).catch((err) => { console.log(err); });
