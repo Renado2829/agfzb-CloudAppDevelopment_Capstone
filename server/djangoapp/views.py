@@ -93,8 +93,10 @@ def signup(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     context = {}
+        context['dealerships'] = get_dealers_from_cf()
     if request.method == "GET":
         return render(request, 'djangoapp/index.html', context)
+
 
 def get_dealerships(request):
     if request.method == "GET":
@@ -111,6 +113,8 @@ from django.template import loader
 from .restapis import get_dealer_reviews_from_cf
 
 def get_dealer_details(request, dealer_id):
+        context = {}
+    context['reviews'] = get_dealer_reviews_from_cf(dealer_id)
     reviews = get_dealer_reviews_from_cf(dealer_id)
     context = {'reviews': reviews}
     template = loader.get_template('dealer_reviews.html')

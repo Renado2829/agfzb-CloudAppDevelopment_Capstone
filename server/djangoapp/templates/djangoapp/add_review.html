@@ -11,6 +11,18 @@
 
 </head>
     <body>
-    <!--Add review form here -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+       <select name="car" id="car" class="form-select" required>
+     {% for car in cars %}
+         <option selected value={{car.id}}>{{car.name}}-{{car.make.name}}-{{ car.year|date:"Y" }}</option>
+     {% endfor %}
+     <script type="text/javascript">
+        $('.date-own').datepicker({
+           format: 'mm/dd/yyyy'
+         });
+   </script>
+</select>
+    
     </body>
 </html>
